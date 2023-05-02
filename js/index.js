@@ -1,5 +1,6 @@
 //status logic
 // Update the battery charge slider
+/*
 function updateBatteryCharge(percentage) {
   $("#battery").val(percentage);
   updateBackgroundColor();
@@ -66,23 +67,118 @@ $("#battery").on("change", function () {
 $("#plugged").on("change", function () {
   updateBackgroundColor();
 });
-
+*/
 //directions logic
 // Wait for Cordova to be fully loaded
 document.addEventListener("deviceready", onDeviceReady, false);
 
 // Callback function for deviceready event
 function onDeviceReady() {
+  function updateBatteryCharge(percentage) {
+    $("#battery").val(percentage);
+    updateBackgroundColor();
+  }
+
+  // Update the plugged in flipswitch
+  function updatePluggedIn(pluggedIn) {
+    $("#plugged").val(pluggedIn);
+    updateBackgroundColor();
+  }
+
+  // Update the background color based on battery charge and plugged in status
+  function updateBackgroundColor() {
+    var charge = $("#battery").val();
+    var pluggedIn = $("#plugged").val();
+
+    if (charge < 20 && pluggedIn === "off") {
+      // Below 20% and not plugged in
+
+      $("body").removeClass("status-red").addClass("status-orange");
+    } else if (charge < 20 && pluggedIn === "on") {
+      // Below 20% and plugged in
+      $("body").removeClass("status-orange").addClass("status-red");
+    } else {
+      // Above 20% or plugged in
+      $("body").removeClass("status-orange status-red");
+    }
+  }
+
+  function updateDeviceInfo() {
+    let deviceInfo = [
+      "Cordova version: " + device.cordova,
+      "Device model: " + device.model,
+      "Device platform: " + device.platform,
+      "Device UUID: " + device,
+      "Device version: " + device.version,
+      "Device manufacturer: " + device.manufacturer,
+      "Device is virtual: " + device.isVirtual,
+      "Device serial number: " + device.serial,
+    ];
+    let deviceInfoList = $("#device-info");
+
+    // Remove any existing device information
+    deviceInfoList.empty();
+
+    // Add each item of device information as a list item
+    for (var i = 0; i < deviceInfo.length; i++) {
+      var item = $("<li>" + deviceInfo[i] + "</li>");
+      deviceInfoList.append(item);
+    }
+  }
+  // Update the battery charge and plugged in status when the page is shown
+  $("#status").on("pageshow", function () {
+    updateBatteryCharge(Math.floor(Math.random() * 101)); // Simulate random battery charge percentage
+    updatePluggedIn(Math.random() >= 0.5 ? "on" : "off"); // Simulate random plugged in status
+    updateDeviceInfo();
+  });
+
+  // Update the battery charge and plugged in status when the slider or flipswitch changes
+  $("#battery").on("change", function () {
+    updateBackgroundColor();
+  });
+
+  $("#plugged").on("change", function () {
+    updateBackgroundColor();
+  });
+
+  window.addEventListener("load", function () {
+    document
+      .getElementById("camera-button")
+      .addEventListener("click", get_image, false);
+  });
+  function get_image() {
+    navigator.camera.getPicture(onSuccessHome, onErrorHome, {
+      quality: 50,
+      destinationType: Camera.DestinationType.DATA_URL,
+    });
+  }
+
+  function onSuccessHome(imageData) {
+    // Create an image element with the captured photo
+    var image = $("<img>").attr("src", "data:image/jpeg;base64," + imageData);
+
+    // Add the image element to the Home page
+    $("#photo").empty().append(image);
+  }
+
+  // Callback function for failed photo capture
+  function onErrorHome(message) {
+    alert("Failed to capture photo: " + message);
+  }
   if ($.mobile.activePage.attr("id") === "home") {
     // Do something for the Home page
-    console.log("camera");
-    $("#camera-button").click(function () {
-      // Get a photo using the Camera plugin
+    console.log("in");
+    window.addEventListener("load", function () {
+      document
+        .getElementById("camera-button")
+        .addEventListener("click", get_image, false);
+    });
+    function get_image() {
       navigator.camera.getPicture(onSuccessHome, onErrorHome, {
         quality: 50,
         destinationType: Camera.DestinationType.DATA_URL,
       });
-    });
+    }
   } else if ($.mobile.activePage.attr("id") === "directions") {
     // Get the current position using the Geolocation plugin
     navigator.geolocation.getCurrentPosition(
@@ -125,6 +221,7 @@ function onErrorDirections(error) {
 
 //Home logic
 // Add an event listener for when the slider value changes
+/*
 window.addEventListener("load", function () {
   document
     .getElementById("camera-button")
@@ -150,3 +247,4 @@ function onSuccessHome(imageData) {
 function onErrorHome(message) {
   alert("Failed to capture photo: " + message);
 }
+*/
