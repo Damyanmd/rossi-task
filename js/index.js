@@ -191,8 +191,33 @@ function onDeviceReady() {
       }
     );
   }
-}
+  // Callback function for successful geolocation
+  function onSuccessDirections(position) {
+    var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
 
+    // Create a Google Maps URL with the current latitude and longitude
+    var url =
+      "https://www.google.com/maps/search/?api=1&query=" +
+      latitude +
+      "," +
+      longitude;
+
+    // Create an iframe element with the Google Maps URL
+    var iframe = $("<iframe>")
+      .attr("src", url)
+      .css({ width: "100%", height: "100%" });
+
+    // Add the iframe element to the Directions page
+    $("#map").empty().append(iframe);
+  }
+
+  // Callback function for failed geolocation
+  function onErrorDirections(error) {
+    alert("Failed to get current position: " + error.message);
+  }
+}
+/*
 // Callback function for successful geolocation
 function onSuccessDirections(position) {
   var latitude = position.coords.latitude;
