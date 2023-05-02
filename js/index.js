@@ -1,3 +1,4 @@
+//status logic
 // Update the battery charge slider
 function updateBatteryCharge(percentage) {
   $("#battery").val(percentage);
@@ -16,7 +17,6 @@ function updateBackgroundColor() {
   var pluggedIn = $("#plugged").val();
 
   if (charge < 20 && pluggedIn === "off") {
-    console.log("in");
     // Below 20% and not plugged in
 
     $("body").removeClass("status-red").addClass("status-orange");
@@ -30,7 +30,7 @@ function updateBackgroundColor() {
 }
 
 function updateDeviceInfo() {
-  var deviceInfo = [
+  let deviceInfo = [
     "Cordova version: " + device.cordova,
     "Device model: " + device.model,
     "Device platform: " + device.platform,
@@ -40,7 +40,7 @@ function updateDeviceInfo() {
     "Device is virtual: " + device.isVirtual,
     "Device serial number: " + device.serial,
   ];
-  var deviceInfoList = $("#device-info");
+  let deviceInfoList = $("#device-info");
 
   // Remove any existing device information
   deviceInfoList.empty();
@@ -67,6 +67,7 @@ $("#plugged").on("change", function () {
   updateBackgroundColor();
 });
 
+//directions logic
 // Wait for Cordova to be fully loaded
 document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -74,20 +75,25 @@ document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
   if ($.mobile.activePage.attr("id") === "home") {
     // Do something for the Home page
+    console.log("camera");
     $("#camera-button").click(function () {
       // Get a photo using the Camera plugin
-      navigator.camera.getPicture(onSuccessHome, onError, {
+      navigator.camera.getPicture(onSuccessHome, onErrorHome, {
         quality: 50,
         destinationType: Camera.DestinationType.DATA_URL,
       });
     });
   } else if ($.mobile.activePage.attr("id") === "directions") {
     // Get the current position using the Geolocation plugin
-    navigator.geolocation.getCurrentPosition(onSuccessDirections, onError, {
-      maximumAge: 3000,
-      timeout: 5000,
-      enableHighAccuracy: true,
-    });
+    navigator.geolocation.getCurrentPosition(
+      onSuccessDirections,
+      onErrorDirections,
+      {
+        maximumAge: 3000,
+        timeout: 5000,
+        enableHighAccuracy: true,
+      }
+    );
   }
 }
 
@@ -115,6 +121,20 @@ function onSuccessDirections(position) {
 // Callback function for failed geolocation
 function onErrorDirections(error) {
   alert("Failed to get current position: " + error.message);
+}
+
+//Home logic
+// Add an event listener for when the slider value changes
+window.addEventListener("load", function () {
+  document
+    .getElementById("camera-button")
+    .addEventListener("click", get_image, false);
+});
+function get_image() {
+  navigator.camera.getPicture(onSuccessHome, onErrorHome, {
+    quality: 50,
+    destinationType: Camera.DestinationType.DATA_URL,
+  });
 }
 
 // Callback function for successful photo capture
